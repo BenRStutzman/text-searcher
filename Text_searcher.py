@@ -1,19 +1,23 @@
 import functions
 
-print('Hello there!')
+functions.welcome()
 
-user_choice = 'new'
-
-while user_choice == 'new':
-    text = functions.get_text()
-    if text == 'q':
-        break
-    user_choice == ''
-    while user_choice == '':
-        user_choice = get_action()
-        if user_choice == 'q':
+action, text = functions.get_text()
+    
+while action != 'q':
+    action = functions.get_action()
+    if action == '0':
+        action, text = functions.get_text()
+        if action == 'q':
             break
-        user_choice = input("Press enter to try more actions on this text, "
-                            "or enter 'new' to choose a different text ('q' to quit): ")
+    elif action == '1':
+        action, word = functions.get_word()
+        if action == 'q':
+            break
+        else:
+            functions.print_frequency(text, word)
+        
+    else:
+        break
 
 print('Have a nice day!')
