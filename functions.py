@@ -30,7 +30,7 @@ def get_text():
                 text = f.read()
                 print("Your text has been imported.")
                 time.sleep(1)
-                return text
+                return (text, filename)
         except FileNotFoundError:
                 filename = input("Sorry, that file wasn't found. Enter "
                                 "another file name: ")
@@ -105,18 +105,66 @@ def print_instances(text, word):
         location = text[location + 1:].lower().find(word.lower()) + location + 1
     time.sleep(1)
 
-def replace_word(text, old_word, new_word):
+def replace_word(text, filename, old_word, new_word):
     """ Replace all instances of a word or phrase with another word or phrase,
     then save the new text in a file. """
     if old_word.lower() not in text.lower():
         print("Sorry, '%s' doesn't appear in the text." % old_word.lower())
         time.sleep(1)
         return
-    with open('text_replaced.txt', 'w+') as f:
-        f.write(text.replace(old_word, old_word.lower())
+    new_name = filename.replace('.txt', '_replaced.txt')
+    with open(new_name, 'w+') as f:
+        f.write(text.replace(old_word.title(), old_word.lower())
                 .replace(old_word.lower(), new_word))
-    print("Your new text is in the file 'text_replaced.txt'.")
+    print("Replacement successful! Your new text is in "
+          "the file '%s'." % new_name)
     time.sleep(1)
+
+def get_shift():
+    """ Ask the user for a Caesar shift value to encode the text. """
+    shift = input("Please enter a Caesar shift value (1 - 25): ")
+    while True:
+        if shift == 'q':
+            raise Q0uitError
+        try:
+            return int(shift) % 26
+        except ValueError:
+            shift= input("Sorry, that's not a valid shift. Please enter "
+                         "an integer, 1 through 25.")
+
+def caesar_shift(text, filename, shift):
+    shifted = ''
+    for letter in text:
+        if letter.isalpha():
+            if letter <= 'Z':
+                letter = chr(ord(letter) + shift)
+                if letter > 'Z':
+                    letter = chr(ord(letter) - 26)
+            else:
+                letter = chr(ord(letter) + shift)
+                if letter > 'z':
+                    letter = chr(ord(letter) - 26)
+        shifted += letter
+    new_name = filename.replace('.txt', '_encoded.txt')
+    with open(new_name, 'w+') as f:
+        f.write(shifted)
+    print("Encoding successful! Your new text is in "
+          "the file '%s'." % new_name)
+    time.sleep(1)
+
+def print_frequency_list(text):
+    words = {}
+    for word in text.lower().split():
+        if word not in words and word.isalpha():
+            words[word] = text.lower().count(word)
+    ordered = []
+    for item in words.items():
+        ordered.append(item)
+    ordered.sort(key = lambda item: item[1], reverse = True)
+    ordered = [item[0] for item in ordered]
+    print("Here are all the words in the text, from most to least frequent:")
+    for word in ordered:
+        print("%d) %s" % (ordered.index(word) + 1, word))
 
 if __name__ == '__main__':
     print("This file contians the functions for 'Text_searcher.py'.")
